@@ -1,0 +1,73 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+scale 0.8
+autonumber
+
+participant "Client App" as app
+participant "Client Backend" as backend
+
+participant "Headless SDK" as headless
+participant "MS-Glue" as glue
+participant "MS-AMS" as ams
+participant "HSM" as hsm
+participant "MS-Enabler" as enabler
+participant "Payment Host" as host
+actor MineSec as minesec
+
+== internal provision ==
+autonumber 1.0
+minesec -> enabler : provision new enabler service \n with customerId/ licenseId
+minesec -> enabler : provision default EMV, TERM, CAPK \n accordingly to L3 & Client
+
+== Create Profile ==
+autonumber 2.0
+backend -> enabler : create profile (mid, tid, supported methods)
+enabler -> enabler : generate: profileId & \n bind(EMV, TERM, CAPK)
+enabler --> backend : return profileId
+
+== Upon new app install ==
+autonumber 3.0
+app -> headless : initSoftPos(app, license)
+app -> headless : initialSetup()
+headless -> headless : load default params (USD defaults)
+headless -> glue : request initial keys(sdkId, customerId, licenseId)
+glue -> ams : validate sdk, get public
+ams --> glue : sdk info & status
+glue -> hsm : get IK
+hsm --> glue : return IK
+glue -> glue : wrap IK with sdk public
+glue --> headless : return wrapped IK
+
+== Upon app startup ==
+autonumber 4.0
+app -> headless : initHeadless(app, license), ideally in app onCreate
+
+== Transaction request ==
+autonumber 5.0
+backend -> app : pass profileId
+app -> headless : poiRequest(profileId, amount)
+headless -> headless : loadProfile(profileId), max 20 cache
+
+opt If no cache
+headless -> glue : getProfile(profileId)
+glue -> enabler : getProfile(profileId)
+enabler --> glue : profile: EMV, TERM, CAPK
+glue --> headless : profile: EMV, TERM, CAPK
+headless -> headless : keep latest 20 profile cached
+end opt
+
+headless -> headless : loadParam(EMV, TERM, CAPK)
+headless -> headless : cardRead
+headless -> glue : tranRequest(profileId, customerId, licenseId, sdkId, poiRequest, cardRead)
+glue -> hsm : decrypt data
+hsm --> glue : decrypted data
+glue -> glue : routeLogic(customerId, licenseId)
+glue -> enabler : tranRequest
+enabler -> host : processTransaction
+host --> enabler : return status
+enabler --> glue : transaction
+glue --> headless: transaction
+headless -> app : transaction
+
+@enduml
