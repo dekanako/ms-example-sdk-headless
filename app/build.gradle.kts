@@ -38,7 +38,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
-    packaging {
+    packagingOptions {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
 
@@ -70,6 +70,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
-    implementation("com.theminesec.sdk:headless:1.0.0-beta01")
+    implementation("com.theminesec.sdk:headless:1.0.0-beta02")
 
 }

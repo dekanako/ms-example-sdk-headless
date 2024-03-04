@@ -4,7 +4,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Shapes
-import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -81,7 +80,7 @@ class ConsumerUiProvider : UiProvider() {
                 .border(1.dp, Color.Red),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "To be replace for your await card animation")
+            super.AwaitCardDisplay()
         }
     }
 
