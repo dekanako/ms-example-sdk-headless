@@ -3,12 +3,11 @@ package com.theminesec.example.headless
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Shapes
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.model.transaction.Amount
@@ -22,32 +21,16 @@ class ClientHeadlessImpl : HeadlessActivity() {
 }
 
 class ClientHeadlessThemeProvider : ThemeProvider() {
-    override fun provideColors(darkTheme: Boolean): Colors {
+    override fun provideColors(darkTheme: Boolean): HeadlessColors {
         return if (darkTheme) {
-            ColorsDark().copy(
-                primary = Color(0xFFD5A23B)
+            HeadlessColorsDark().copy(
+                primary = Color(0xFFD5A23B).toArgb()
             )
         } else {
-            ColorsLight().copy(
-                primary = Color(0xFFFFC145)
+            HeadlessColorsLight().copy(
+                primary = Color(0xFFFFC145).toArgb()
             )
         }
-    }
-
-    override fun provideSchemeColors(): SchemeColors {
-        return SchemeColors().copy()
-    }
-
-    override fun provideSpacing(): Spacing {
-        return Spacing().copy()
-    }
-
-    override fun provideTypography(): Typography {
-        return Types.copy()
-    }
-
-    override fun provideShapes(): Shapes {
-        return Shapes.copy()
     }
 }
 
@@ -73,14 +56,14 @@ class ConsumerUiProvider : UiProvider() {
     }
 
     @Composable
-    override fun AwaitCardDisplay() {
+    override fun AwaitCardIndicator() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .border(1.dp, Color.Red),
             contentAlignment = Alignment.Center
         ) {
-            super.AwaitCardDisplay()
+            super.AwaitCardIndicator()
         }
     }
 

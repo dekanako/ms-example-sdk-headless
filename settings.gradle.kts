@@ -45,4 +45,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "MS Example - Headless SDK"
-include(":app")
+include(":compose")
+include(":xml")

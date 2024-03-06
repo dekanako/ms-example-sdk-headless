@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="view"
+            type="com.theminesec.example.headless_xml.ClientMain"
+            />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ClientMain"
+        tools:ignore="HardcodedText"
+        >
+
+        <Button
+            android:id="@+id/btnInitStatus"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SDK Init status"
+            android:onClick="@{()->view.checkInitStatus()}"
+            />
+
+        <Button
+            android:id="@+id/btnInitialSetup"
+            app:layout_constraintTop_toBottomOf="@id/btnInitStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Initial Setup"
+            android:layout_marginTop="16dp"
+            android:onClick="@{()->view.initialSetup()}"
+            />
+
+        <Button
+            android:id="@+id/btnLaunchNewSale"
+            app:layout_constraintTop_toBottomOf="@id/btnInitialSetup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Launch new sale $10"
+            android:layout_marginTop="16dp"
+            android:onClick="@{()->view.launchNewSale()}"
+            />
+
+        <Button
+            android:id="@+id/btnLaunchNewSale20"
+            app:layout_constraintTop_toBottomOf="@id/btnLaunchNewSale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Launch new sale $20"
+            android:layout_marginTop="16dp"
+            android:onClick="@{()->view.launchNewSale20()}"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
