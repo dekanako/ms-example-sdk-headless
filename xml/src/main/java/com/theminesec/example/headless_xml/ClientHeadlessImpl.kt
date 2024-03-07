@@ -7,13 +7,16 @@ import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.net.Uri
+import android.view.LayoutInflater
 import android.view.Surface
 import android.view.TextureView
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
-import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.databinding.DataBindingUtil
+import com.theminesec.example.headless_xml.databinding.CompAmountDisplayBinding
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.model.transaction.Amount
 import com.theminesec.sdk.headless.model.transaction.PaymentMethod
@@ -45,20 +48,34 @@ object ClientViewProvider :
     private fun Int.intToDp(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
 
     override fun createAmountView(context: Context, amount: Amount, description: String?): View {
-        return LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            addView(TextView(context)
-                .apply {
-                    textAlignment = View.TEXT_ALIGNMENT_CENTER
-                    text = "Total amount here"
-                })
-            addView(TextView(context)
-                .apply {
-                    textAlignment = View.TEXT_ALIGNMENT_CENTER
-                    text = "${amount.currency.currencyCode}${amount.value}"
-                })
-        }
+        val inflater = LayoutInflater.from(context)
+        return DataBindingUtil.inflate<CompAmountDisplayBinding>(inflater, R.layout.comp_amount_display, null, false)
+            .apply {
+                root.layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+                    ConstraintLayout.LayoutParams.MATCH_PARENT
+                )
+                this.amount = amount
+                this.description = "dummy description"
+            }
+            .root
+
+        // return LinearLayout(context).apply {
+        //     orientation = LinearLayout.VERTICAL
+        //     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        //     addView(TextView(context)
+        //         .apply {
+        //             textSize = 30F
+        //             textAlignment = TEXT_ALIGNMENT_CENTER
+        //             text = "Total amount here"
+        //         })
+        //     addView(TextView(context)
+        //         .apply {
+        //             textSize = 40F
+        //             textAlignment = TEXT_ALIGNMENT_CENTER
+        //             text = "${amount.currency.currencyCode}${amount.value}"
+        //         })
+        // }
     }
 
     override fun createAwaitCardIndicatorView(context: Context): View {
