@@ -1,15 +1,19 @@
 package com.theminesec.example.headless_xml
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Color
+import android.graphics.SurfaceTexture
+import android.media.MediaPlayer
+import android.net.Uri
+import android.view.Surface
+import android.view.TextureView
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
 import android.widget.TextView
-import androidx.core.view.isVisible
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.model.transaction.Amount
 import com.theminesec.sdk.headless.model.transaction.PaymentMethod
@@ -43,24 +47,44 @@ object ClientViewProvider :
     override fun createAmountView(context: Context, amount: Amount, description: String?): View {
         return LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             addView(TextView(context)
                 .apply {
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
                     text = "Total amount here"
                 })
             addView(TextView(context)
                 .apply {
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
                     text = "${amount.currency.currencyCode}${amount.value}"
                 })
         }
     }
 
     override fun createAwaitCardIndicatorView(context: Context): View {
-        return ImageView(context).apply {
-            layoutParams = LayoutParams(
-                200.intToDp(context),
-                200.intToDp(context)
-            )
-            setBackgroundColor(Color.parseColor("#FFD503"))
+        val mediaPlayer = MediaPlayer()
+        return TextureView(context).apply {
+            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+                    val videoUri = Uri.Builder()
+                        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                        .authority(context.packageName)
+                        .appendPath("${R.raw.demo_await}")
+                        .build()
+
+                    mediaPlayer.apply {
+                        setDataSource(context, videoUri)
+                        setSurface(Surface(surface))
+                        isLooping = true
+                        prepareAsync()
+                        setOnPreparedListener { start() }
+                    }
+                }
+
+                override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {}
+                override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
+                override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
+            }
         }
     }
 
@@ -91,18 +115,42 @@ object ClientViewProvider :
     }
 
     override fun createProgressIndicatorView(context: Context): View {
-        return CircularProgressIndicator(context).apply {
-            layoutParams = LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT
-            )
-            indicatorSize = 200.intToDp(context)
-            trackThickness = 8.intToDp(context)
-            isIndeterminate = true
-            trackColor = Color.TRANSPARENT
-            setIndicatorColor(Color.parseColor("#FFD503"))
-            isVisible = true
+        val mediaPlayer = MediaPlayer()
+        return TextureView(context).apply {
+            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+                    val videoUri = Uri.Builder()
+                        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                        .authority(context.packageName)
+                        .appendPath("${R.raw.demo_processing}")
+                        .build()
+
+                    mediaPlayer.apply {
+                        setDataSource(context, videoUri)
+                        setSurface(Surface(surface))
+                        isLooping = true
+                        prepareAsync()
+                        setOnPreparedListener { start() }
+                    }
+                }
+
+                override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {}
+                override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
+                override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
+            }
         }
+        // return CircularProgressIndicator(context).apply {
+        //     layoutParams = LayoutParams(
+        //         LayoutParams.MATCH_PARENT,
+        //         LayoutParams.MATCH_PARENT
+        //     )
+        //     indicatorSize = 200.intToDp(context)
+        //     trackThickness = 8.intToDp(context)
+        //     isIndeterminate = true
+        //     trackColor = Color.TRANSPARENT
+        //     setIndicatorColor(Color.parseColor("#FFD503"))
+        //     isVisible = true
+        // }
     }
 
 }
