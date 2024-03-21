@@ -17,7 +17,7 @@
 
 ![Overview](./docs/flow-overview.png)
 
-### Error code
+## Error code
 
 For `WrappedResult.Failed`.`code`, enum class available @ `HeadlessError`
 
