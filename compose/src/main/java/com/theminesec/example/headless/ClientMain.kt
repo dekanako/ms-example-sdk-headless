@@ -9,19 +9,25 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.google.gson.*
 import com.theminesec.example.headless.exampleHelper.HelperLayout
 import com.theminesec.example.headless.exampleHelper.HelperViewModel
 import com.theminesec.example.headless.exampleHelper.component.Button
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.HeadlessService
 import com.theminesec.sdk.headless.HeadlessSetup
+import com.theminesec.sdk.headless.model.WrappedResult
 import com.theminesec.sdk.headless.model.transaction.*
 import kotlinx.coroutines.launch
-import ulid.ULID
+import java.lang.reflect.Type
+import java.time.Instant
 import java.util.*
 
 class ClientMain : ComponentActivity() {
@@ -29,11 +35,27 @@ class ClientMain : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val viewModel: HelperViewModel by viewModels()
+        var completedTranId: String? by mutableStateOf(null)
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Instant::class.java, object : JsonSerializer<Instant> {
+                override fun serialize(p0: Instant?, p1: Type?, p2: JsonSerializationContext?): JsonElement = JsonPrimitive(p0?.toString())
+            })
+            .setPrettyPrinting().create()
 
         val launcher = registerForActivityResult(
             HeadlessActivity.contract(ClientHeadlessImpl::class.java)
         ) {
-            viewModel.writeMessage("WrappedResult<Transaction>: \n$it}")
+            viewModel.writeMessage("${it.javaClass.simpleName} \n${gson.toJson(it)}")
+            when (it) {
+                is WrappedResult.Success -> {
+                    completedTranId = it.value.tranId
+                    viewModel.writeMessage("Success:\n$it}")
+                }
+
+                is WrappedResult.Failure -> {
+                    viewModel.writeMessage("Failed:\n$it}")
+                }
+            }
         }
 
         setContent {
@@ -99,12 +121,28 @@ class ClientMain : ComponentActivity() {
                                 viewModel.amountStr.toBigDecimal(),
                                 Currency.getInstance(viewModel.currency),
                             ),
-                            profileId = "hkd-p1",
-                            forceFetchProfile = false
+                            profileId = "prof_01HSEDQK3ZFH7R0KASB8T1SBSN",
+                            forceFetchProfile = true
                         )
                     )
                 }) {
-                    Text(text = "TranRequest with profile 1 (Full method)")
+                    Text(text = "TranRequest with profile")
+                }
+
+                Button(onClick = {
+                    launcher.launch(
+                        PoiRequest.New(
+                            tranType = TranType.SALE,
+                            amount = Amount(
+                                "0.69".toBigDecimal(),
+                                Currency.getInstance(viewModel.currency),
+                            ),
+                            profileId = "prof_01HSEDQK3ZFH7R0KASB8T1SBSN",
+                            forceFetchProfile = true
+                        )
+                    )
+                }) {
+                    Text(text = "Mock Declined")
                 }
                 Button(onClick = {
                     launcher.launch(
@@ -114,24 +152,28 @@ class ClientMain : ComponentActivity() {
                                 viewModel.amountStr.toBigDecimal(),
                                 Currency.getInstance(viewModel.currency),
                             ),
-                            profileId = "hkd-limited-payment",
+                            profileId = "wrong profile",
                             forceFetchProfile = true
                         )
                     )
                 }) {
-                    Text(text = "TranRequest with profile 2 (VMA)")
+                    Text(text = "TranRequest with wrong profile id")
                 }
 
                 HorizontalDivider()
                 Button(onClick = {
-                    val action = PoiRequest.Action(ActionType.VOID, ULID.randomULID())
-                    launcher.launch(action)
+                    completedTranId?.let {
+                        val action = PoiRequest.Action(ActionType.VOID, it)
+                        launcher.launch(action)
+                    } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "Action (after transaction) request with UI")
                 }
                 Button(onClick = {
-                    val query = PoiRequest.Query(Referencable.TranId(ULID.randomULID()))
-                    launcher.launch(query)
+                    completedTranId?.let {
+                        val query = PoiRequest.Query(Referencable.TranId(it))
+                        launcher.launch(query)
+                    } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "Query request with UI")
                 }
@@ -139,20 +181,25 @@ class ClientMain : ComponentActivity() {
                 HorizontalDivider()
 
                 Button(onClick = {
-                    val action = PoiRequest.Action(ActionType.VOID, ULID.randomULID())
-                    lifecycleScope.launch {
-                        HeadlessService.createAction(action)
-                            .also { viewModel.writeMessage("createAction: $it") }
-                    }
+                    completedTranId?.let { tranId ->
+                        val action = PoiRequest.Action(ActionType.VOID, tranId)
+                        lifecycleScope.launch {
+                            HeadlessService.createAction(action)
+                                .also { viewModel.writeMessage("createAction: $it") }
+                        }
+                    } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "Action request without UI")
                 }
                 Button(onClick = {
-                    lifecycleScope.launch {
-                        val reference = Referencable.TranId(ULID.randomULID())
-                        HeadlessService.getTransaction(reference)
-                            .also { viewModel.writeMessage("getTransaction: $it") }
-                    }
+                    completedTranId?.let { tranId ->
+                        lifecycleScope.launch {
+                            val reference = Referencable.TranId(tranId)
+                            HeadlessService.getTransaction(reference).also {
+                                viewModel.writeMessage("getTransaction: $it")
+                            }
+                        }
+                    } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "Query request without UI")
                 }

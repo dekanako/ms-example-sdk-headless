@@ -10,7 +10,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.theminesec.example.headless_xml"
+        applicationId = "com.theminesec.example.headless_xml.remote"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -62,5 +62,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
 
-    implementation("com.theminesec.sdk:headless:1.0.0-beta05")
+    implementation("com.theminesec.sdk:headless:1.0.1")
 }

@@ -46,7 +46,7 @@ class ClientMain : AppCompatActivity() {
                     "10.00".toBigDecimal(),
                     Currency.getInstance("HKD"),
                 ),
-                profileId = "hkd-p1",
+                profileId = "prof_01HSEDQK3ZFH7R0KASB8T1SBSN",
                 forceFetchProfile = true
             )
         )
@@ -60,8 +60,8 @@ class ClientMain : AppCompatActivity() {
                     "20.00".toBigDecimal(),
                     Currency.getInstance("HKD"),
                 ),
-                profileId = "hkd-limited",
-                forceFetchProfile = true
+                profileId = "wrong profile",
+                forceFetchProfile = false
             )
         )
     }

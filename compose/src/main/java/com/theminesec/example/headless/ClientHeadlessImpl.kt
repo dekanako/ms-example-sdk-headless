@@ -17,7 +17,7 @@ import com.theminesec.sdk.headless.ui.UiProvider
 
 class ClientHeadlessImpl : HeadlessActivity() {
     override fun provideTheme(): ThemeProvider = ClientHeadlessThemeProvider()
-    override fun provideUi(): UiProvider = ConsumerUiProvider()
+    override fun provideUi(): UiProvider = ClientUiProvider()
 }
 
 class ClientHeadlessThemeProvider : ThemeProvider() {
@@ -34,7 +34,7 @@ class ClientHeadlessThemeProvider : ThemeProvider() {
     }
 }
 
-class ConsumerUiProvider : UiProvider() {
+class ClientUiProvider : UiProvider() {
     @Composable
     override fun AmountDisplay(amount: Amount, description: String?) {
         Box(
@@ -61,7 +61,6 @@ class ConsumerUiProvider : UiProvider() {
             modifier = Modifier
                 .fillMaxSize()
                 .border(1.dp, Color.Red),
-            contentAlignment = Alignment.Center
         ) {
             super.AwaitCardIndicator()
         }
