@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     >
 
@@ -12,7 +11,8 @@
             />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ClientMain"
@@ -21,7 +21,6 @@
 
         <Button
             android:id="@+id/btnInitStatus"
-            app:layout_constraintTop_toTopOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="SDK Init status"
@@ -30,7 +29,6 @@
 
         <Button
             android:id="@+id/btnInitialSetup"
-            app:layout_constraintTop_toBottomOf="@id/btnInitStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Initial Setup"
@@ -40,7 +38,6 @@
 
         <Button
             android:id="@+id/btnLaunchNewSale"
-            app:layout_constraintTop_toBottomOf="@id/btnInitialSetup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Launch new sale $10"
@@ -49,14 +46,22 @@
             />
 
         <Button
-            android:id="@+id/btnLaunchNewSale20"
-            app:layout_constraintTop_toBottomOf="@id/btnLaunchNewSale"
+            android:id="@+id/btnSaleWithSign"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Launch with wrong profile"
+            android:text="Launch new sale $1001"
             android:layout_marginTop="16dp"
-            android:onClick="@{()->view.launchNewSale20()}"
+            android:onClick="@{()->view.launchNewSaleWithSign()}"
             />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/btnLaunchNewSaleWrongProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No profile"
+            android:layout_marginTop="16dp"
+            android:onClick="@{()->view.launchNewSaleWrongProfile()}"
+            />
+
+    </LinearLayout>
 </layout>

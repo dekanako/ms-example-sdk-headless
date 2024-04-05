@@ -14,14 +14,21 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.theminesec.example.headless_xml.databinding.CompAmountDisplayBinding
+import com.theminesec.example.headless_xml.databinding.CompOrSignatureScreenBinding
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.model.transaction.Amount
 import com.theminesec.sdk.headless.model.transaction.PaymentMethod
 import com.theminesec.sdk.headless.ui.*
+import com.theminesec.sdk.headless.ui.component.SignaturePad
+import com.theminesec.sdk.headless.ui.component.SignatureState
 import com.theminesec.sdk.headless.ui.component.resource.getImageRes
+import kotlinx.coroutines.launch
 
 class ClientHeadlessImpl : HeadlessActivity() {
     override fun provideTheme(): ThemeProvider {
@@ -34,6 +41,7 @@ class ClientHeadlessImpl : HeadlessActivity() {
             progressIndicatorView = ClientViewProvider,
             awaitCardIndicatorView = ClientViewProvider,
             acceptanceMarksView = ClientViewProvider,
+            signatureScreenView = ClientViewProvider
         )
     }
 }
@@ -43,7 +51,8 @@ object ClientViewProvider :
     AmountView,
     ProgressIndicatorView,
     AwaitCardIndicatorView,
-    AcceptanceMarksView {
+    AcceptanceMarksView,
+    SignatureScreenView {
 
     private fun Int.intToDp(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
 
@@ -168,6 +177,53 @@ object ClientViewProvider :
         //     setIndicatorColor(Color.parseColor("#FFD503"))
         //     isVisible = true
         // }
+    }
+
+    override fun createSignatureView(
+        context: Context,
+        amount: Amount?,
+        maskedAccount: String?,
+        paymentMethod: PaymentMethod?,
+        approvalCode: String?,
+        signatureState: SignatureState,
+        onConfirm: () -> Unit
+    ): View {
+        val inflater = LayoutInflater.from(context)
+        val binding = DataBindingUtil.inflate<CompOrSignatureScreenBinding>(inflater, R.layout.comp_or_signature_screen, null, false)
+            .apply {
+                root.layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+                    ConstraintLayout.LayoutParams.MATCH_PARENT
+                )
+                this.amount = amount
+                this.maskedAccount = maskedAccount
+                this.paymentMethod = paymentMethod
+                this.approvalCode = approvalCode
+            }
+
+        binding.composeViewSignaturePad.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.Default)
+            setContent { SignaturePad(state = signatureState) }
+        }
+
+        binding.btnClear.apply {
+            (context as LifecycleOwner).lifecycleScope.launch {
+                signatureState.signatureLines.collect {
+                    isEnabled = it.isNotEmpty()
+                }
+            }
+            setOnClickListener { signatureState.clearSignatureLines() }
+        }
+        binding.btnConfirm.apply {
+            (context as LifecycleOwner).lifecycleScope.launch {
+                signatureState.signatureLines.collect {
+                    isEnabled = it.isNotEmpty()
+                }
+            }
+            setOnClickListener { onConfirm() }
+        }
+
+        return binding.root
     }
 
 }

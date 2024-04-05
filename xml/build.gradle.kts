@@ -35,6 +35,10 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packagingOptions {
         resources {
@@ -62,5 +66,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
 
-    implementation("com.theminesec.sdk:headless:1.0.1")
+    implementation("com.theminesec.sdk:headless:1.0.4")
+
+    implementation(platform("androidx.compose:compose-bom:2024.02.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
 }

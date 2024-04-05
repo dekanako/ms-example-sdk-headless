@@ -7,9 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.theminesec.example.headless_xml.databinding.ActivityMainBinding
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.HeadlessSetup
-import com.theminesec.sdk.headless.model.transaction.Amount
-import com.theminesec.sdk.headless.model.transaction.PoiRequest
-import com.theminesec.sdk.headless.model.transaction.TranType
+import com.theminesec.sdk.headless.model.transaction.*
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -46,13 +44,37 @@ class ClientMain : AppCompatActivity() {
                     "10.00".toBigDecimal(),
                     Currency.getInstance("HKD"),
                 ),
-                profileId = "prof_01HSEDQK3ZFH7R0KASB8T1SBSN",
-                forceFetchProfile = true
+                profileId = "prof_01HSJR9XQ353KN7YWXRXGNKD0K",
+                preferredAcceptanceTag = "SME",
+                forcePaymentMethod = null,
+                description = "description 123",
+                posReference = "OR-ref 123",
+                forceFetchProfile = true,
+                cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
             )
         )
     }
 
-    fun launchNewSale20() {
+    fun launchNewSaleWithSign() {
+        launcher.launch(
+            PoiRequest.New(
+                tranType = TranType.SALE,
+                amount = Amount(
+                    "1001.00".toBigDecimal(),
+                    Currency.getInstance("HKD"),
+                ),
+                profileId = "prof_01HSJR9XQ353KN7YWXRXGNKD0K",
+                preferredAcceptanceTag = "SME",
+                forcePaymentMethod = PaymentMethod.MASTERCARD,
+                description = "description 123",
+                posReference = "OR-ref 123",
+                forceFetchProfile = true,
+                cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
+            )
+        )
+    }
+
+    fun launchNewSaleWrongProfile() {
         launcher.launch(
             PoiRequest.New(
                 tranType = TranType.SALE,

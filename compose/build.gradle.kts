@@ -73,5 +73,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.theminesec.sdk:headless:1.0.1")
+
+    implementation("com.theminesec.sdk:headless:1.0.4")
 }

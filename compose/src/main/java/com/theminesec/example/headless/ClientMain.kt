@@ -49,11 +49,10 @@ class ClientMain : ComponentActivity() {
             when (it) {
                 is WrappedResult.Success -> {
                     completedTranId = it.value.tranId
-                    viewModel.writeMessage("Success:\n$it}")
                 }
 
                 is WrappedResult.Failure -> {
-                    viewModel.writeMessage("Failed:\n$it}")
+                    viewModel.writeMessage("Failed")
                 }
             }
         }
@@ -121,8 +120,14 @@ class ClientMain : ComponentActivity() {
                                 viewModel.amountStr.toBigDecimal(),
                                 Currency.getInstance(viewModel.currency),
                             ),
-                            profileId = "prof_01HSEDQK3ZFH7R0KASB8T1SBSN",
-                            forceFetchProfile = true
+                            profileId = "prof_01HSJR9XQ353KN7YWXRXGNKD0K",
+                            preferredAcceptanceTag = "SME",
+                            forcePaymentMethod = null,
+                            description = "description 123",
+                            posReference = "OR-ref 123",
+                            forceFetchProfile = true,
+                            cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
+
                         )
                     )
                 }) {
@@ -130,19 +135,16 @@ class ClientMain : ComponentActivity() {
                 }
 
                 Button(onClick = {
-                    launcher.launch(
-                        PoiRequest.New(
-                            tranType = TranType.SALE,
-                            amount = Amount(
-                                "0.69".toBigDecimal(),
-                                Currency.getInstance(viewModel.currency),
-                            ),
-                            profileId = "prof_01HSEDQK3ZFH7R0KASB8T1SBSN",
-                            forceFetchProfile = true
+                    completedTranId?.let {
+                        launcher.launch(
+                            PoiRequest.Action(
+                                actionType = ActionType.LINK_REFUND,
+                                tranId = it
+                            )
                         )
-                    )
+                    } ?: viewModel.writeMessage("No txn id")
                 }) {
-                    Text(text = "Mock Declined")
+                    Text(text = "Linked Refund")
                 }
                 Button(onClick = {
                     launcher.launch(
