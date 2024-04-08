@@ -65,7 +65,7 @@ class ClientMain : AppCompatActivity() {
                 ),
                 profileId = "prof_01HSJR9XQ353KN7YWXRXGNKD0K",
                 preferredAcceptanceTag = "SME",
-                forcePaymentMethod = PaymentMethod.MASTERCARD,
+                forcePaymentMethod = listOf(PaymentMethod.MASTERCARD),
                 description = "description 123",
                 posReference = "OR-ref 123",
                 forceFetchProfile = true,
