@@ -9,6 +9,7 @@ import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.HeadlessSetup
 import com.theminesec.sdk.headless.model.transaction.*
 import kotlinx.coroutines.launch
+import ulid.ULID
 import java.util.*
 
 class ClientMain : AppCompatActivity() {
@@ -48,7 +49,7 @@ class ClientMain : AppCompatActivity() {
                 preferredAcceptanceTag = "SME",
                 forcePaymentMethod = null,
                 description = "description 123",
-                posReference = "OR-ref 123",
+                posReference = "or-ref-${ULID.randomULID()}",
                 forceFetchProfile = true,
                 cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
             )
@@ -67,7 +68,7 @@ class ClientMain : AppCompatActivity() {
                 preferredAcceptanceTag = "SME",
                 forcePaymentMethod = listOf(PaymentMethod.MASTERCARD),
                 description = "description 123",
-                posReference = "OR-ref 123",
+                posReference = "or-ref-${ULID.randomULID()}",
                 forceFetchProfile = true,
                 cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
             )

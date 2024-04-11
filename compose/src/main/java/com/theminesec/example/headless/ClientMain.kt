@@ -36,6 +36,7 @@ class ClientMain : ComponentActivity() {
 
         val viewModel: HelperViewModel by viewModels()
         var completedTranId: String? by mutableStateOf(null)
+        var completedPosReference: String? by mutableStateOf(null)
         val gson = GsonBuilder()
             .registerTypeAdapter(Instant::class.java, object : JsonSerializer<Instant> {
                 override fun serialize(p0: Instant?, p1: Type?, p2: JsonSerializationContext?): JsonElement = JsonPrimitive(p0?.toString())
@@ -49,6 +50,7 @@ class ClientMain : ComponentActivity() {
             when (it) {
                 is WrappedResult.Success -> {
                     completedTranId = it.value.tranId
+                    completedPosReference = it.value.posReference
                 }
 
                 is WrappedResult.Failure -> {
@@ -122,12 +124,11 @@ class ClientMain : ComponentActivity() {
                             ),
                             profileId = "prof_01HSJR9XQ353KN7YWXRXGNKD0K",
                             preferredAcceptanceTag = "SME",
-                            forcePaymentMethod = listOf(PaymentMethod.MASTERCARD),
+                            forcePaymentMethod = listOf(PaymentMethod.VISA, PaymentMethod.MASTERCARD),
                             description = "description 123",
-                            posReference = "OR-ref 123",
+                            posReference = viewModel.posReference,
                             forceFetchProfile = true,
                             cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
-
                         )
                     )
                 }) {
@@ -178,6 +179,14 @@ class ClientMain : ComponentActivity() {
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "Query request with UI")
+                }
+                Button(onClick = {
+                    completedPosReference?.let {
+                        val query = PoiRequest.Query(Referencable.PosReference(it))
+                        launcher.launch(query)
+                    } ?: viewModel.writeMessage("No pos ref")
+                }) {
+                    Text(text = "Query request with UI by pos ref")
                 }
 
                 HorizontalDivider()
