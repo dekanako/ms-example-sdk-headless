@@ -14,6 +14,7 @@ import com.theminesec.sdk.headless.model.transaction.Amount
 import com.theminesec.sdk.headless.model.transaction.PaymentMethod
 import com.theminesec.sdk.headless.ui.ThemeProvider
 import com.theminesec.sdk.headless.ui.UiProvider
+import com.theminesec.sdk.headless.ui.UiState
 
 class ClientHeadlessImpl : HeadlessActivity() {
     override fun provideTheme(): ThemeProvider = ClientHeadlessThemeProvider()
@@ -73,6 +74,16 @@ class ClientUiProvider : UiProvider() {
             contentAlignment = Alignment.Center
         ) {
             super.ProgressIndicator()
+        }
+    }
+
+    @Composable
+    override fun UiStateDisplay(modifier: Modifier, uiState: UiState, countdownSec: Int) {
+        Box(
+            modifier = Modifier.border(1.dp, Color.Red),
+            contentAlignment = Alignment.Center
+        ) {
+            super.UiStateDisplay(modifier, uiState, countdownSec)
         }
     }
 }

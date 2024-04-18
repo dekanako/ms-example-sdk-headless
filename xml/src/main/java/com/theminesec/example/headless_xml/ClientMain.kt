@@ -39,7 +39,7 @@ class ClientMain : AppCompatActivity() {
 
     fun launchNewSale() {
         launcher.launch(
-            PoiRequest.New(
+            PoiRequest.ActionNew(
                 tranType = TranType.SALE,
                 amount = Amount(
                     "10.00".toBigDecimal(),
@@ -49,7 +49,7 @@ class ClientMain : AppCompatActivity() {
                 preferredAcceptanceTag = "SME",
                 forcePaymentMethod = null,
                 description = "description 123",
-                posReference = "or-ref-${ULID.randomULID()}",
+                posReference = "pos_${ULID.randomULID()}",
                 forceFetchProfile = true,
                 cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
             )
@@ -58,7 +58,7 @@ class ClientMain : AppCompatActivity() {
 
     fun launchNewSaleWithSign() {
         launcher.launch(
-            PoiRequest.New(
+            PoiRequest.ActionNew(
                 tranType = TranType.SALE,
                 amount = Amount(
                     "1001.00".toBigDecimal(),
@@ -66,9 +66,9 @@ class ClientMain : AppCompatActivity() {
                 ),
                 profileId = "prof_01HSJR9XQ353KN7YWXRXGNKD0K",
                 preferredAcceptanceTag = "SME",
-                forcePaymentMethod = listOf(PaymentMethod.MASTERCARD),
+                forcePaymentMethod = listOf(PaymentMethod.VISA, PaymentMethod.MASTERCARD),
                 description = "description 123",
-                posReference = "or-ref-${ULID.randomULID()}",
+                posReference = "pos_${ULID.randomULID()}",
                 forceFetchProfile = true,
                 cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
             )
@@ -77,7 +77,7 @@ class ClientMain : AppCompatActivity() {
 
     fun launchNewSaleWrongProfile() {
         launcher.launch(
-            PoiRequest.New(
+            PoiRequest.ActionNew(
                 tranType = TranType.SALE,
                 amount = Amount(
                     "20.00".toBigDecimal(),

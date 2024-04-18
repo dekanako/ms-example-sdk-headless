@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Surface
 import android.view.TextureView
@@ -14,6 +15,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
+import android.widget.TextView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
@@ -21,9 +23,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.theminesec.example.headless_xml.databinding.CompAmountDisplayBinding
 import com.theminesec.example.headless_xml.databinding.CompOrSignatureScreenBinding
+import com.theminesec.example.headless_xml.databinding.CompOrUiStateDisplayBinding
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.model.transaction.Amount
 import com.theminesec.sdk.headless.model.transaction.PaymentMethod
+import com.theminesec.sdk.headless.model.transaction.WalletType
 import com.theminesec.sdk.headless.ui.*
 import com.theminesec.sdk.headless.ui.component.SignaturePad
 import com.theminesec.sdk.headless.ui.component.SignatureState
@@ -35,24 +39,27 @@ class ClientHeadlessImpl : HeadlessActivity() {
         return ClientThemeProvider()
     }
 
+    private val provider = ClientViewProvider()
     override fun provideUi(): UiProvider {
         return UiProvider(
-            amountView = ClientViewProvider,
-            progressIndicatorView = ClientViewProvider,
-            awaitCardIndicatorView = ClientViewProvider,
-            acceptanceMarksView = ClientViewProvider,
-            signatureScreenView = ClientViewProvider
+            amountView = provider,
+            progressIndicatorView = provider,
+            awaitCardIndicatorView = provider,
+            acceptanceMarksView = provider,
+            signatureScreenView = provider,
+            uiStateDisplayView = provider
         )
     }
 }
 
 @SuppressLint("SetTextI18n")
-object ClientViewProvider :
+class ClientViewProvider :
     AmountView,
     ProgressIndicatorView,
     AwaitCardIndicatorView,
     AcceptanceMarksView,
-    SignatureScreenView {
+    SignatureScreenView,
+    UiStateDisplayView {
 
     private fun Int.intToDp(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
 
@@ -134,7 +141,7 @@ object ClientViewProvider :
             }
             if (showWallet) {
                 addView(ImageView(context).apply {
-                    setImageResource(PaymentMethod.APPLE_PAY.getImageRes())
+                    setImageResource(WalletType.APPLE_PAY.getImageRes())
                 })
             }
         }
@@ -224,6 +231,47 @@ object ClientViewProvider :
         }
 
         return binding.root
+    }
+
+    private var tv: TextView? = null
+    override fun createUiStateDisplayView(
+        context: Context,
+        uiState: UiState,
+    ): View {
+        val inflater = LayoutInflater.from(context)
+        val binding = DataBindingUtil.inflate<CompOrUiStateDisplayBinding>(inflater, R.layout.comp_or_ui_state_display, null, false)
+            .apply {
+                root.layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
+
+        tv = binding.tvCountdown
+        binding.tvTitle.text = context.getString(uiState.getTitleRes())
+        binding.tvDesc.text = context.getString(uiState.getDescriptionRes())
+        when (uiState) {
+            is UiState.Awaiting -> {
+                binding.tvCountdown.visibility = View.VISIBLE
+                binding.containerPms.visibility = View.VISIBLE
+                binding.containerPms.addView(createAcceptanceMarksView(context, uiState.supportedPayments, showWallet = true))
+            }
+
+            is UiState.Processing -> {
+                binding.tvCountdown.visibility = View.VISIBLE
+            }
+
+            else -> {
+                binding.tvCountdown.visibility = View.GONE
+            }
+        }
+
+        return binding.root
+    }
+
+    override fun onCountdownUpdate(countdownSec: Int) {
+        Log.d(TAG, "xml onCountdownUpdate: $countdownSec")
+        tv?.text = "${countdownSec}s"
     }
 
 }

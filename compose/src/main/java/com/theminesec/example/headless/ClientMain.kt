@@ -27,6 +27,7 @@ import com.theminesec.sdk.headless.model.WrappedResult
 import com.theminesec.sdk.headless.model.transaction.*
 import kotlinx.coroutines.launch
 import java.lang.reflect.Type
+import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 
@@ -35,8 +36,10 @@ class ClientMain : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val viewModel: HelperViewModel by viewModels()
-        var completedTranId: String? by mutableStateOf(null)
-        var completedPosReference: String? by mutableStateOf(null)
+        var completedSaleTranId: String? by mutableStateOf(null)
+        var completedSalePosReference: String? by mutableStateOf(null)
+        var completedSaleRequestId: String? by mutableStateOf(null)
+        var completedRefundTranId: String? by mutableStateOf(null)
         val gson = GsonBuilder()
             .registerTypeAdapter(Instant::class.java, object : JsonSerializer<Instant> {
                 override fun serialize(p0: Instant?, p1: Type?, p2: JsonSerializationContext?): JsonElement = JsonPrimitive(p0?.toString())
@@ -47,10 +50,17 @@ class ClientMain : ComponentActivity() {
             HeadlessActivity.contract(ClientHeadlessImpl::class.java)
         ) {
             viewModel.writeMessage("${it.javaClass.simpleName} \n${gson.toJson(it)}")
+            viewModel.resetRandomPosReference()
             when (it) {
                 is WrappedResult.Success -> {
-                    completedTranId = it.value.tranId
-                    completedPosReference = it.value.posReference
+                    if (it.value.tranType == TranType.SALE) {
+                        completedSaleTranId = it.value.tranId
+                        completedSalePosReference = it.value.posReference
+                        completedSaleRequestId = it.value.actions.firstOrNull()?.requestId
+                    }
+                    if (it.value.tranType == TranType.REFUND) {
+                        completedRefundTranId = it.value.tranId
+                    }
                 }
 
                 is WrappedResult.Failure -> {
@@ -116,7 +126,7 @@ class ClientMain : ComponentActivity() {
 
                 Button(onClick = {
                     launcher.launch(
-                        PoiRequest.New(
+                        PoiRequest.ActionNew(
                             tranType = TranType.SALE,
                             amount = Amount(
                                 viewModel.amountStr.toBigDecimal(),
@@ -132,87 +142,132 @@ class ClientMain : ComponentActivity() {
                         )
                     )
                 }) {
-                    Text(text = "TranRequest with profile")
-                }
-
-                Button(onClick = {
-                    completedTranId?.let {
-                        launcher.launch(
-                            PoiRequest.Action(
-                                actionType = ActionType.LINK_REFUND,
-                                tranId = it
-                            )
-                        )
-                    } ?: viewModel.writeMessage("No txn id")
-                }) {
-                    Text(text = "Linked Refund")
-                }
-                Button(onClick = {
-                    launcher.launch(
-                        PoiRequest.New(
-                            tranType = TranType.SALE,
-                            amount = Amount(
-                                viewModel.amountStr.toBigDecimal(),
-                                Currency.getInstance(viewModel.currency),
-                            ),
-                            profileId = "wrong profile",
-                            forceFetchProfile = true
-                        )
-                    )
-                }) {
-                    Text(text = "TranRequest with wrong profile id")
+                    Text(text = "PoiRequest.ActionNew")
                 }
 
                 HorizontalDivider()
+                Text(text = "With UI\nActivity result launcher", style = MaterialTheme.typography.titleLarge)
+
                 Button(onClick = {
-                    completedTranId?.let {
-                        val action = PoiRequest.Action(ActionType.VOID, it)
+                    completedSaleTranId?.let {
+                        val action = PoiRequest.ActionVoid(it)
                         launcher.launch(action)
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
-                    Text(text = "Action (after transaction) request with UI")
+                    Text(text = "PoiRequest.ActionVoid")
                 }
                 Button(onClick = {
-                    completedTranId?.let {
+                    completedSaleTranId?.let {
+                        val action = PoiRequest.ActionLinkedRefund(it)
+                        launcher.launch(action)
+                    } ?: viewModel.writeMessage("No tran ID")
+                }) {
+                    Text(text = "PoiRequest.ActionLinkedRefund (full amt)")
+                }
+                Button(onClick = {
+                    completedSaleTranId?.let {
+                        val action = PoiRequest.ActionLinkedRefund(it, Amount(BigDecimal("0.5"), Currency.getInstance(viewModel.currency)))
+                        launcher.launch(action)
+                    } ?: viewModel.writeMessage("No tran ID")
+                }) {
+                    Text(text = "PoiRequest.ActionLinkedRefund (partial amt)")
+                }
+                Button(onClick = {
+                    completedRefundTranId?.let {
+                        val action = PoiRequest.ActionVoid(it)
+                        launcher.launch(action)
+                    } ?: viewModel.writeMessage("No tran ID")
+                }) {
+                    Text(text = "PoiRequest.ActionVoid (using refund tran id)")
+                }
+                Button(onClick = {
+                    completedSaleTranId?.let {
                         val query = PoiRequest.Query(Referencable.TranId(it))
                         launcher.launch(query)
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
-                    Text(text = "Query request with UI")
+                    Text(text = "PoiRequest.Query (TranId)")
                 }
                 Button(onClick = {
-                    completedPosReference?.let {
+                    completedSalePosReference?.let {
                         val query = PoiRequest.Query(Referencable.PosReference(it))
                         launcher.launch(query)
                     } ?: viewModel.writeMessage("No pos ref")
                 }) {
-                    Text(text = "Query request with UI by pos ref")
+                    Text(text = "PoiRequest.Query (PosReference)")
+                }
+                Button(onClick = {
+                    completedSaleRequestId?.let {
+                        val query = PoiRequest.Query(Referencable.RequestId(it))
+                        launcher.launch(query)
+                    } ?: viewModel.writeMessage("No poi req id")
+                }) {
+                    Text(text = "PoiRequest.Query (RequestId)")
                 }
 
                 HorizontalDivider()
+                Text(text = "Without UI\nSuspended API", style = MaterialTheme.typography.titleLarge)
 
                 Button(onClick = {
-                    completedTranId?.let { tranId ->
-                        val action = PoiRequest.Action(ActionType.VOID, tranId)
+                    completedSaleTranId?.let {
+                        val action = PoiRequest.ActionVoid(it)
                         lifecycleScope.launch {
-                            HeadlessService.createAction(action)
-                                .also { viewModel.writeMessage("createAction: $it") }
+                            HeadlessService.createAction(action).also { viewModel.writeMessage("createAction: $it") }
                         }
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
-                    Text(text = "Action request without UI")
+                    Text(text = "PoiRequest.ActionVoid")
                 }
                 Button(onClick = {
-                    completedTranId?.let { tranId ->
+                    completedSaleTranId?.let {
+                        val action = PoiRequest.ActionLinkedRefund(it)
                         lifecycleScope.launch {
-                            val reference = Referencable.TranId(tranId)
-                            HeadlessService.getTransaction(reference).also {
-                                viewModel.writeMessage("getTransaction: $it")
-                            }
+                            HeadlessService.createAction(action).also { viewModel.writeMessage("createAction: $it") }
+                        }
+                        launcher.launch(action)
+                    } ?: viewModel.writeMessage("No tran ID")
+                }) {
+                    Text(text = "PoiRequest.ActionLinkedRefund (full amt)")
+                }
+                Button(onClick = {
+                    completedSaleTranId?.let {
+                        val action = PoiRequest.ActionLinkedRefund(it, Amount(BigDecimal("0.5"), Currency.getInstance(viewModel.currency)))
+                        lifecycleScope.launch {
+                            HeadlessService.createAction(action).also { viewModel.writeMessage("createAction: $it") }
                         }
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
-                    Text(text = "Query request without UI")
+                    Text(text = "PoiRequest.ActionLinkedRefund (partial amt)")
+                }
+                Button(onClick = {
+                    completedSaleTranId?.let {
+                        val query = Referencable.TranId(it)
+                        lifecycleScope.launch {
+                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("queryTransaction: $it") }
+                        }
+                    } ?: viewModel.writeMessage("No tran ID")
+                }) {
+                    Text(text = "PoiRequest.Query (TranId)")
+                }
+                Button(onClick = {
+                    completedSalePosReference?.let {
+                        val query = Referencable.PosReference(it)
+                        lifecycleScope.launch {
+                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("queryTransaction: $it") }
+                        }
+                    } ?: viewModel.writeMessage("No pos ref")
+                }) {
+                    Text(text = "PoiRequest.Query (PosReference)")
+                }
+                Button(onClick = {
+                    completedSaleRequestId?.let {
+                        val query = Referencable.RequestId(it)
+                        lifecycleScope.launch {
+                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("queryTransaction: $it") }
+                        }
+                    } ?: viewModel.writeMessage("No req id")
+                }) {
+                    Text(text = "PoiRequest.Query (RequestId)")
                 }
             }
         }
