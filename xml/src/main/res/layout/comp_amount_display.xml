@@ -8,7 +8,7 @@
 
         <variable
             name="amount"
-            type="com.theminesec.sdk.headless.model.transaction.Amount"
+            type="String"
             />
 
         <variable

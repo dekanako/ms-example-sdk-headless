@@ -71,7 +71,7 @@ class ClientViewProvider :
                     ConstraintLayout.LayoutParams.MATCH_PARENT,
                     ConstraintLayout.LayoutParams.MATCH_PARENT
                 )
-                this.amount = amount
+                this.amount = amount.value.toString()
                 this.description = "dummy description"
             }
             .root
