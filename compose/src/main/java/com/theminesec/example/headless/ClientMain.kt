@@ -132,13 +132,15 @@ class ClientMain : ComponentActivity() {
                                 viewModel.amountStr.toBigDecimal(),
                                 Currency.getInstance(viewModel.currency),
                             ),
-                            profileId = "prof_01HSJR9XQ353KN7YWXRXGNKD0K",
+                            profileId = "prof_01HWPEMPHW95AWD8YY0Q0VX8Y3",
                             preferredAcceptanceTag = "SME",
                             forcePaymentMethod = listOf(PaymentMethod.VISA, PaymentMethod.MASTERCARD),
                             description = "description 123",
                             posReference = viewModel.posReference,
                             forceFetchProfile = true,
-                            cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
+                            cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE,
+                            acqTid = "30157001",
+                            tapToOwnDevice = false,
                         )
                     )
                 }) {
@@ -147,6 +149,9 @@ class ClientMain : ComponentActivity() {
 
                 HorizontalDivider()
                 Text(text = "With UI\nActivity result launcher", style = MaterialTheme.typography.titleLarge)
+
+                Text(text = "Last SALE: $completedSaleTranId")
+                Text(text = "Last REFUND: $completedRefundTranId")
 
                 Button(onClick = {
                     completedSaleTranId?.let {
