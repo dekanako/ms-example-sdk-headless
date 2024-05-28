@@ -74,5 +74,5 @@ dependencies {
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
-    implementation("com.theminesec.sdk:headless:1.0.9")
+    implementation("com.theminesec.sdk:headless-stage:1.0.10")
 }

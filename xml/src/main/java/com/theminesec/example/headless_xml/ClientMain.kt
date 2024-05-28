@@ -45,13 +45,12 @@ class ClientMain : AppCompatActivity() {
                     "10.00".toBigDecimal(),
                     Currency.getInstance("HKD"),
                 ),
-                profileId = "prof_01HWPEMPHW95AWD8YY0Q0VX8Y3",
+                profileId = "prof_01HYYPGVE7VB901M40SVPHTQ0V",
                 preferredAcceptanceTag = "SME",
                 forcePaymentMethod = null,
                 description = "description 123",
                 posReference = "pos_${ULID.randomULID()}",
                 forceFetchProfile = true,
-                acqTid = "30157001",
                 cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
             )
         )
@@ -65,13 +64,12 @@ class ClientMain : AppCompatActivity() {
                     "1001.00".toBigDecimal(),
                     Currency.getInstance("HKD"),
                 ),
-                profileId = "prof_01HWPEMPHW95AWD8YY0Q0VX8Y3",
+                profileId = "prof_01HYYPGVE7VB901M40SVPHTQ0V",
                 preferredAcceptanceTag = "SME",
                 forcePaymentMethod = listOf(PaymentMethod.VISA, PaymentMethod.MASTERCARD),
                 description = "description 123",
                 posReference = "pos_${ULID.randomULID()}",
                 forceFetchProfile = true,
-                acqTid = "30157001",
                 cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE
             )
         )

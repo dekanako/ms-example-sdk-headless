@@ -132,14 +132,13 @@ class ClientMain : ComponentActivity() {
                                 viewModel.amountStr.toBigDecimal(),
                                 Currency.getInstance(viewModel.currency),
                             ),
-                            profileId = "prof_01HWPEMPHW95AWD8YY0Q0VX8Y3",
+                            profileId = "prof_01HYYPGVE7VB901M40SVPHTQ0V",
                             preferredAcceptanceTag = "SME",
                             forcePaymentMethod = listOf(PaymentMethod.VISA, PaymentMethod.MASTERCARD),
                             description = "description 123",
                             posReference = viewModel.posReference,
                             forceFetchProfile = true,
                             cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE,
-                            acqTid = "30157001",
                             tapToOwnDevice = false,
                         )
                     )
