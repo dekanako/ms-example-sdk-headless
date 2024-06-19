@@ -8,6 +8,7 @@ import com.theminesec.example.headless_xml.databinding.ActivityMainBinding
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.HeadlessSetup
 import com.theminesec.sdk.headless.model.transaction.*
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ulid.ULID
 import java.util.*
@@ -19,7 +20,7 @@ class ClientMain : AppCompatActivity() {
     private val launcher = registerForActivityResult(
         HeadlessActivity.contract(ClientHeadlessImpl::class.java)
     ) {
-        Log.d(TAG, "onCreate: WrappedResult<Transaction>: $it}")
+        Log.d(TAG, "MainActivity launcher result back for WrappedResult<Transaction>: $it}")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,9 +28,9 @@ class ClientMain : AppCompatActivity() {
         binding.view = this
     }
 
-    fun checkInitStatus() {
-        val sdkInitResp = (application as ClientApp).sdkInitResp
-        Log.d(TAG, "checkInitStatus: $sdkInitResp")
+    fun checkInitStatus() = lifecycleScope.launch {
+        val sdkInitStatus = (application as ClientApp).sdkInitStatus.first()
+        Log.d(TAG, "checkInitStatus: $sdkInitStatus")
     }
 
     fun initialSetup() = lifecycleScope.launch {

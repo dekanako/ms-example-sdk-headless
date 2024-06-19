@@ -25,6 +25,7 @@ import com.theminesec.sdk.headless.HeadlessService
 import com.theminesec.sdk.headless.HeadlessSetup
 import com.theminesec.sdk.headless.model.WrappedResult
 import com.theminesec.sdk.headless.model.transaction.*
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.lang.reflect.Type
 import java.math.BigDecimal
@@ -45,6 +46,11 @@ class ClientMain : ComponentActivity() {
                 override fun serialize(p0: Instant?, p1: Type?, p2: JsonSerializationContext?): JsonElement = JsonPrimitive(p0?.toString())
             })
             .setPrettyPrinting().create()
+
+        lifecycleScope.launch {
+            val status = (application as ClientApp).sdkInitStatus.first()
+            viewModel.writeMessage("SDK Init: $status")
+        }
 
         val launcher = registerForActivityResult(
             HeadlessActivity.contract(ClientHeadlessImpl::class.java)
@@ -72,8 +78,10 @@ class ClientMain : ComponentActivity() {
         setContent {
             HelperLayout {
                 Button(onClick = {
-                    val sdkInitResp = (application as ClientApp).sdkInitResp
-                    viewModel.writeMessage("sdkInitResp: $sdkInitResp}")
+                    lifecycleScope.launch {
+                        val status = (application as ClientApp).sdkInitStatus.first()
+                        viewModel.writeMessage("SDK Init: $status")
+                    }
                 }) {
                     Text(text = "SDK init status")
                 }
