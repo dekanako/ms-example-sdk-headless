@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="view"
+            type="com.theminesec.example.headless_xml_java.ClientMain"
+            />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ClientMain"
+        tools:ignore="HardcodedText"
+        >
+
+        <Button
+            android:id="@+id/btnInitStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SDK Init status"
+            android:onClick="@{()->view.checkInitStatus()}"
+            />
+
+        <Button
+            android:id="@+id/btnInitialSetup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Initial Setup"
+            android:layout_marginTop="16dp"
+            android:onClick="@{()->view.initialSetup()}"
+            />
+
+        <Button
+            android:id="@+id/btnLaunchNewSale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Launch new sale $10"
+            android:layout_marginTop="16dp"
+            android:onClick="@{()->view.launchNewSale()}"
+            />
+
+        <Button
+            android:id="@+id/btnSaleWithSign"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Launch new sale $1001"
+            android:layout_marginTop="16dp"
+            android:onClick="@{()->view.launchNewSaleWithSign()}"
+            />
+
+        <Button
+            android:id="@+id/btnLaunchNewSaleWrongProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No profile"
+            android:layout_marginTop="16dp"
+            android:onClick="@{()->view.launchNewSaleWrongProfile()}"
+            />
+
+    </LinearLayout>
+</layout>

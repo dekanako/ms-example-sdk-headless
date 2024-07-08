@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">XML Headless</string>
+    <string name="var_approval_code">App Code: %1$s</string>
+</resources>
