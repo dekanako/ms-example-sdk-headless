@@ -66,7 +66,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
 
-    implementation("com.theminesec.sdk:headless-stage:1.0.11")
+    debugImplementation("com.theminesec.sdk:headless-stage:1.0.12")
+    releaseImplementation("com.theminesec.sdk:headless:1.0.12")
 
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     implementation("androidx.compose.ui:ui")
