@@ -46,9 +46,11 @@ For `WrappedResult.Failed`.`code`, enum class available @ `HeadlessError`
 
 #### (43_xxx) network error
 
-| name              | code   | default message                  |
-|-------------------|--------|----------------------------------|
-| ConnectionTimeout | 43_001 | "Connection to upstream timeout" |
+| name                   | code   | default message                                  |
+|------------------------|--------|--------------------------------------------------|
+| ConnectionTimeout      | 43_001 | "Connection to upstream timeout"                 |
+| NetworkClientSideError | 43_002 | "Client request error, please check the request" |
+| NetworkServerSideError | 43_003 | "Server error, please try again later"           |
 
 #### (49_xxx) other source error
 
