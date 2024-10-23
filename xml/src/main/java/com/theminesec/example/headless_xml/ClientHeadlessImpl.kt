@@ -24,10 +24,10 @@ import androidx.lifecycle.lifecycleScope
 import com.theminesec.example.headless_xml.databinding.CompAmountDisplayBinding
 import com.theminesec.example.headless_xml.databinding.CompOrSignatureScreenBinding
 import com.theminesec.example.headless_xml.databinding.CompOrUiStateDisplayBinding
+import com.theminesec.lib.dto.common.Amount
+import com.theminesec.lib.dto.transaction.PaymentMethod
+import com.theminesec.lib.dto.transaction.WalletType
 import com.theminesec.sdk.headless.HeadlessActivity
-import com.theminesec.sdk.headless.model.transaction.Amount
-import com.theminesec.sdk.headless.model.transaction.PaymentMethod
-import com.theminesec.sdk.headless.model.transaction.WalletType
 import com.theminesec.sdk.headless.ui.*
 import com.theminesec.sdk.headless.ui.component.SignaturePad
 import com.theminesec.sdk.headless.ui.component.SignatureState
@@ -233,7 +233,9 @@ class ClientViewProvider :
         return binding.root
     }
 
-    private var tv: TextView? = null
+    private var tvCountdown: TextView? = null
+    private var tvTitle: TextView? = null
+    private var tvDesc: TextView? = null
     override fun createUiStateDisplayView(
         context: Context,
         uiState: UiState,
@@ -247,7 +249,9 @@ class ClientViewProvider :
                 )
             }
 
-        tv = binding.tvCountdown
+        tvCountdown = binding.tvCountdown
+        tvTitle = binding.tvTitle
+        tvDesc = binding.tvDesc
         binding.tvTitle.text = context.getString(uiState.getTitleRes())
         binding.tvDesc.text = context.getString(uiState.getDescriptionRes())
         when (uiState) {
@@ -271,9 +275,14 @@ class ClientViewProvider :
 
     override fun onCountdownUpdate(countdownSec: Int) {
         Log.d(TAG, "xml onCountdownUpdate: $countdownSec")
-        tv?.text = "${countdownSec}s"
+        tvCountdown?.text = "${countdownSec}s"
     }
 
+    override fun onUiStateUpdate(context: Context, uiState: UiState, countdownSec: Int) {
+        tvCountdown?.text = "${countdownSec}s"
+        tvTitle?.text = context.getString(uiState.getTitleRes())
+        tvDesc?.text = context.getString(uiState.getDescriptionRes())
+    }
 }
 
 class ClientThemeProvider : ThemeProvider() {

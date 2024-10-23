@@ -8,7 +8,7 @@
 
         <variable
             name="amount"
-            type="com.theminesec.sdk.headless.model.transaction.Amount"
+            type="com.theminesec.lib.dto.common.Amount"
             />
 
         <variable
@@ -18,7 +18,7 @@
 
         <variable
             name="paymentMethod"
-            type="com.theminesec.sdk.headless.model.transaction.PaymentMethod"
+            type="com.theminesec.lib.dto.transaction.PaymentMethod"
             />
 
         <variable

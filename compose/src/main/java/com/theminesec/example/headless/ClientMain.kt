@@ -20,11 +20,16 @@ import com.google.gson.*
 import com.theminesec.example.headless.exampleHelper.HelperLayout
 import com.theminesec.example.headless.exampleHelper.HelperViewModel
 import com.theminesec.example.headless.exampleHelper.component.Button
+import com.theminesec.lib.dto.common.Amount
+import com.theminesec.lib.dto.poi.CvmSignatureMode
+import com.theminesec.lib.dto.poi.PoiRequest
+import com.theminesec.lib.dto.poi.Referencable
+import com.theminesec.lib.dto.transaction.PaymentMethod
+import com.theminesec.lib.dto.transaction.TranType
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.HeadlessService
 import com.theminesec.sdk.headless.HeadlessSetup
 import com.theminesec.sdk.headless.model.WrappedResult
-import com.theminesec.sdk.headless.model.transaction.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.lang.reflect.Type

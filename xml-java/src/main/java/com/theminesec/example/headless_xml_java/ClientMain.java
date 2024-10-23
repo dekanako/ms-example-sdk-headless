@@ -6,14 +6,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.theminesec.example.headless_xml_java.databinding.ActivityMainBinding;
+import com.theminesec.lib.dto.common.Amount;
+import com.theminesec.lib.dto.poi.CvmSignatureMode;
+import com.theminesec.lib.dto.poi.PoiRequest;
+import com.theminesec.lib.dto.transaction.TranType;
 import com.theminesec.sdk.headless.HeadlessActivity;
 import com.theminesec.sdk.headless.HeadlessSetup;
 import com.theminesec.sdk.headless.model.WrappedResult;
 import com.theminesec.sdk.headless.model.setup.SdkInitResp;
-import com.theminesec.sdk.headless.model.transaction.Amount;
-import com.theminesec.sdk.headless.model.transaction.CvmSignatureMode;
-import com.theminesec.sdk.headless.model.transaction.PoiRequest;
-import com.theminesec.sdk.headless.model.transaction.TranType;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -53,7 +53,7 @@ public class ClientMain extends AppCompatActivity {
                 TranType.SALE,
                 new Amount(
                         new BigDecimal("10.00"),
-                        Currency.getInstance("HKD")
+                        Currency.getInstance("USD")
                 ),
                 "prof_01HYYPGVE7VB901M40SVPHTQ0V",
                 null,
@@ -64,6 +64,7 @@ public class ClientMain extends AppCompatActivity {
                 null,
                 false,
                 false,
+                null,
                 null,
                 null
         ));
@@ -74,7 +75,7 @@ public class ClientMain extends AppCompatActivity {
                 TranType.SALE,
                 new Amount(
                         new BigDecimal("1001.00"),
-                        Currency.getInstance("HKD")
+                        Currency.getInstance("USD")
                 ),
                 "prof_01HYYPGVE7VB901M40SVPHTQ0V",
                 null,
@@ -86,6 +87,7 @@ public class ClientMain extends AppCompatActivity {
                 false,
                 false,
                 null,
+                null,
                 null
         ));
     }
@@ -95,7 +97,7 @@ public class ClientMain extends AppCompatActivity {
                 TranType.SALE,
                 new Amount(
                         BigDecimal.ONE,
-                        Currency.getInstance("HKD")
+                        Currency.getInstance("USD")
                 ),
                 "wrong profile",
                 null,
@@ -106,6 +108,7 @@ public class ClientMain extends AppCompatActivity {
                 null,
                 false,
                 false,
+                null,
                 null,
                 null
         ));

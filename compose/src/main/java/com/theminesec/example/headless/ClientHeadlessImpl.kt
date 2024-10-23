@@ -9,9 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+import com.theminesec.lib.dto.common.Amount
+import com.theminesec.lib.dto.transaction.PaymentMethod
 import com.theminesec.sdk.headless.HeadlessActivity
-import com.theminesec.sdk.headless.model.transaction.Amount
-import com.theminesec.sdk.headless.model.transaction.PaymentMethod
 import com.theminesec.sdk.headless.ui.ThemeProvider
 import com.theminesec.sdk.headless.ui.UiProvider
 import com.theminesec.sdk.headless.ui.UiState

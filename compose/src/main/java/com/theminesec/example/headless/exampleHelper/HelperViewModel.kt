@@ -29,7 +29,7 @@ class HelperViewModel : ViewModel() {
 
     // demo part
     var posReference by mutableStateOf(ULID.randomULID())
-    val currency by mutableStateOf("HKD")
+    val currency by mutableStateOf("USD")
     var amountStr by mutableStateOf("2")
         private set
 

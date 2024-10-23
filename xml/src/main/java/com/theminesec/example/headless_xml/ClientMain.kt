@@ -5,9 +5,13 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.theminesec.example.headless_xml.databinding.ActivityMainBinding
+import com.theminesec.lib.dto.common.Amount
+import com.theminesec.lib.dto.poi.CvmSignatureMode
+import com.theminesec.lib.dto.poi.PoiRequest
+import com.theminesec.lib.dto.transaction.PaymentMethod
+import com.theminesec.lib.dto.transaction.TranType
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.HeadlessSetup
-import com.theminesec.sdk.headless.model.transaction.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ulid.ULID
@@ -44,7 +48,7 @@ class ClientMain : AppCompatActivity() {
                 tranType = TranType.SALE,
                 amount = Amount(
                     "10.00".toBigDecimal(),
-                    Currency.getInstance("HKD"),
+                    Currency.getInstance("USD"),
                 ),
                 profileId = "prof_01HYYPGVE7VB901M40SVPHTQ0V",
                 preferredAcceptanceTag = "SME",
@@ -63,7 +67,7 @@ class ClientMain : AppCompatActivity() {
                 tranType = TranType.SALE,
                 amount = Amount(
                     "1001.00".toBigDecimal(),
-                    Currency.getInstance("HKD"),
+                    Currency.getInstance("USD"),
                 ),
                 profileId = "prof_01HYYPGVE7VB901M40SVPHTQ0V",
                 preferredAcceptanceTag = "SME",
@@ -82,7 +86,7 @@ class ClientMain : AppCompatActivity() {
                 tranType = TranType.SALE,
                 amount = Amount(
                     "20.00".toBigDecimal(),
-                    Currency.getInstance("HKD"),
+                    Currency.getInstance("USD"),
                 ),
                 profileId = "wrong profile",
                 forceFetchProfile = false
