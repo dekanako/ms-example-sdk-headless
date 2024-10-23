@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Sample MSA UI</string>
+    <string name="var_copyright">© %1$s Some Copyrighted</string>
+</resources>
