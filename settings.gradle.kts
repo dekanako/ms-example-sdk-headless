@@ -12,7 +12,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
+        //mavenLocal()
 
         // MineSec's maven registry
         maven {
