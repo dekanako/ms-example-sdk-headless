@@ -9,6 +9,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/compose" />
+            <option value="$PROJECT_DIR$/compose-screen" />
+            <option value="$PROJECT_DIR$/landing" />
             <option value="$PROJECT_DIR$/msa-ui" />
             <option value="$PROJECT_DIR$/xml" />
             <option value="$PROJECT_DIR$/xml-java" />

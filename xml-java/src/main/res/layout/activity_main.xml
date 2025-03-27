@@ -7,7 +7,7 @@
 
         <variable
             name="view"
-            type="com.theminesec.example.headless_xml_java.ClientMain"
+            type="com.theminesec.example.headless.ClientMain"
             />
     </data>
 
