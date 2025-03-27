@@ -66,10 +66,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
 
-    debugImplementation("com.theminesec.sdk:headless-stage:1.2.0")
-    releaseImplementation("com.theminesec.sdk:headless:1.2.0")
-
     implementation(platform("androidx.compose:compose-bom:2024.10.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
+
+    val versionHeadless: String by project
+    implementation("com.theminesec.sdk:headless-stage:$versionHeadless")
+    //debugImplementation("com.theminesec.sdk:headless-stage:$versionHeadless")
+    //releaseImplementation("com.theminesec.sdk:headless:$versionHeadless")
 }

@@ -74,7 +74,8 @@ dependencies {
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
     implementation("com.google.code.gson:gson:2.11.0")
 
-    implementation("com.theminesec.sdk:headless-stage:1.2.7")
-    //debugImplementation("com.theminesec.sdk:headless-stage:1.2.7")
-    //releaseImplementation("com.theminesec.sdk:headless:1.2.7")
+    val versionHeadless: String by project
+    implementation("com.theminesec.sdk:headless-stage:$versionHeadless")
+    //debugImplementation("com.theminesec.sdk:headless-stage:$versionHeadless")
+    //releaseImplementation("com.theminesec.sdk:headless:$versionHeadless")
 }

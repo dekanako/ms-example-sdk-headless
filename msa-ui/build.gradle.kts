@@ -68,10 +68,11 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    // minesec
-    debugImplementation("com.theminesec.sdk:headless-stage:1.2.0")
-    releaseImplementation("com.theminesec.sdk:headless:1.2.0")
-
     // just for display
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    val versionHeadless: String by project
+    implementation("com.theminesec.sdk:headless-stage:$versionHeadless")
+    //debugImplementation("com.theminesec.sdk:headless-stage:$versionHeadless")
+    //releaseImplementation("com.theminesec.sdk:headless:$versionHeadless")
 }
