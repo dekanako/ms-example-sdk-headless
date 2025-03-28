@@ -10,6 +10,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -25,54 +27,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.theminesec.example.headless.landing.ui.HelperLayout
-import com.theminesec.example.headless.landing.ui.component.Button
+import com.theminesec.example.headless.landing.ui.component.ThemedButton
 import com.theminesec.lib.dto.common.Amount
 import com.theminesec.lib.dto.common.toCurrency
+import com.theminesec.lib.dto.poi.CvmSignatureMode
 import com.theminesec.lib.dto.poi.PoiRequest
 import com.theminesec.lib.dto.poi.Referencable
 import com.theminesec.lib.dto.transaction.TranType
-import com.theminesec.lib.dto.transaction.Transaction
-import com.theminesec.lib.serializer.InstantSerializer
 import com.theminesec.sdk.headless.HeadlessActivity
 import com.theminesec.sdk.headless.HeadlessService
 import com.theminesec.sdk.headless.HeadlessSetup
 import com.theminesec.sdk.headless.model.WrappedResult
-import com.theminesec.sdk.headless.model.setup.SdkInitResp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
 import java.math.BigDecimal
 import java.util.*
 
 abstract class LandingMain : ComponentActivity() {
     abstract val headlessImplClass: Class<out HeadlessActivity>
-    private val json = Json {
-        prettyPrint = true
-        isLenient = true
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-        serializersModule = SerializersModule {
-            contextual(Instant::class, InstantSerializer)
-            // could consider bound to an interface, but doesn't much in terms of performance anyway
-            polymorphic(Any::class) {
-                subclass(Amount::class, Amount.serializer())
-                subclass(SdkInitResp::class, SdkInitResp.serializer())
-                subclass(Transaction::class, Transaction.serializer())
-            }
-            polymorphic(PoiRequest::class) {
-                subclass(PoiRequest.ActionNew::class, PoiRequest.ActionNew.serializer())
-                subclass(PoiRequest.ActionVoid::class, PoiRequest.ActionVoid.serializer())
-                subclass(PoiRequest.ActionLinkedRefund::class, PoiRequest.ActionLinkedRefund.serializer())
-                subclass(PoiRequest.ActionAuthComp::class, PoiRequest.ActionAuthComp.serializer())
-                subclass(PoiRequest.ActionAdjust::class, PoiRequest.ActionAdjust.serializer())
-                subclass(PoiRequest.Query::class, PoiRequest.Query.serializer())
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,9 +65,9 @@ abstract class LandingMain : ComponentActivity() {
             HeadlessActivity.contract(headlessImplClass)
         ) {
             viewModel.resetRandomPosReference()
+            viewModel.writeMessage("ActivityResult: $it")
             when (it) {
                 is WrappedResult.Success -> {
-                    viewModel.writeMessage(json.encodeToString(it.value))
                     if (it.value.tranType == TranType.SALE) {
                         completedSaleTranId = it.value.tranId
                         completedSalePosReference = it.value.posReference
@@ -108,32 +80,39 @@ abstract class LandingMain : ComponentActivity() {
 
                 is WrappedResult.Failure -> {
                     viewModel.writeMessage("Failed")
-                    viewModel.writeMessage(json.encodeToString(it))
                 }
             }
         }
 
         setContent {
             HelperLayout {
-                Button(onClick = {
+                ThemedButton(onClick = {
                     lifecycleScope.launch {
                         val status = (application as ExampleApp).sdkInitStatus.first()
                         viewModel.writeMessage("SDK Init: $status")
                     }
                 }) {
-                    Text(text = "SDK init status")
+                    Text(text = "Get SDK status")
                 }
 
-                Button(onClick = {
+                ThemedButton(onClick = {
                     lifecycleScope.launch {
                         val res = HeadlessSetup.initialSetup(this@LandingMain)
                         viewModel.writeMessage("initialSetup: $res")
                     }
                 }) {
-                    Text(text = "Initial setups (download Keys)")
+                    Text(text = "Initial setups (keys etc)")
                 }
 
                 HorizontalDivider()
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = "ProfileId") },
+                    value = viewModel.profileId,
+                    onValueChange = {},
+                    enabled = false,
+                )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -172,6 +151,12 @@ abstract class LandingMain : ComponentActivity() {
 
                 var ttod by remember { mutableStateOf(false) }
                 Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                        ) { ttod = !ttod },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
@@ -179,7 +164,37 @@ abstract class LandingMain : ComponentActivity() {
                     Text(text = "TTOD (Tap to own device)")
                 }
 
-                Button(onClick = {
+                var signOnPaper by remember { mutableStateOf(false) }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                        ) { signOnPaper = !signOnPaper },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Switch(signOnPaper, { signOnPaper = it })
+                    Text(text = "Signature on paper")
+                }
+
+                var forceFetchProfile by remember { mutableStateOf(true) }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                        ) { forceFetchProfile = !forceFetchProfile },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Switch(forceFetchProfile, { forceFetchProfile = it })
+                    Text(text = "Force fetch profile")
+                }
+
+                ThemedButton(onClick = {
                     launcher.launch(
                         PoiRequest.ActionNew(
                             tranType = TranType.SALE,
@@ -190,11 +205,15 @@ abstract class LandingMain : ComponentActivity() {
                             profileId = viewModel.profileId,
                             tapToOwnDevice = ttod,
                             posReference = viewModel.posReference,
-                            forceFetchProfile = true,
+                            forceFetchProfile = forceFetchProfile,
+                            cvmSignatureMode = if (signOnPaper) CvmSignatureMode.SIGN_ON_PAPER else CvmSignatureMode.ELECTRONIC_SIGNATURE,
                             //preferredAcceptanceTag = "SME",
                             //forcePaymentMethod = listOf(PaymentMethod.VISA, PaymentMethod.MASTERCARD),
                             //description = "description 123",
-                            //cvmSignatureMode = CvmSignatureMode.ELECTRONIC_SIGNATURE,
+                            extra = buildMap {
+                                put("extra1", "value1")
+                                put("extra2", "value2")
+                            }
                         )
                     )
                 }) {
@@ -207,7 +226,7 @@ abstract class LandingMain : ComponentActivity() {
                 Text(text = "Last SALE: $completedSaleTranId")
                 Text(text = "Last REFUND: $completedRefundTranId")
 
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleTranId?.let {
                         val action = PoiRequest.ActionVoid(it)
                         launcher.launch(action)
@@ -215,7 +234,7 @@ abstract class LandingMain : ComponentActivity() {
                 }) {
                     Text(text = "PoiRequest.ActionVoid")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleTranId?.let {
                         val action = PoiRequest.ActionLinkedRefund(it)
                         launcher.launch(action)
@@ -223,7 +242,7 @@ abstract class LandingMain : ComponentActivity() {
                 }) {
                     Text(text = "PoiRequest.ActionLinkedRefund (full amt)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleTranId?.let {
                         val action = PoiRequest.ActionLinkedRefund(
                             it,
@@ -234,7 +253,7 @@ abstract class LandingMain : ComponentActivity() {
                 }) {
                     Text(text = "PoiRequest.ActionLinkedRefund (partial amt)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedRefundTranId?.let {
                         val action = PoiRequest.ActionVoid(it)
                         launcher.launch(action)
@@ -242,7 +261,7 @@ abstract class LandingMain : ComponentActivity() {
                 }) {
                     Text(text = "PoiRequest.ActionVoid (using refund tran id)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleTranId?.let {
                         val query = PoiRequest.Query(Referencable.TranId(it))
                         launcher.launch(query)
@@ -250,7 +269,7 @@ abstract class LandingMain : ComponentActivity() {
                 }) {
                     Text(text = "PoiRequest.Query (TranId)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSalePosReference?.let {
                         val query = PoiRequest.Query(Referencable.PosReference(it))
                         launcher.launch(query)
@@ -258,7 +277,7 @@ abstract class LandingMain : ComponentActivity() {
                 }) {
                     Text(text = "PoiRequest.Query (PosReference)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleRequestId?.let {
                         val query = PoiRequest.Query(Referencable.RequestId(it))
                         launcher.launch(query)
@@ -270,62 +289,62 @@ abstract class LandingMain : ComponentActivity() {
                 HorizontalDivider()
                 Text(text = "Without UI\nSuspended API", style = MaterialTheme.typography.titleLarge)
 
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleTranId?.let {
                         val action = PoiRequest.ActionVoid(it)
                         lifecycleScope.launch {
-                            HeadlessService.createAction(action).also { viewModel.writeMessage("createAction: ${json.encodeToString(it)}") }
+                            HeadlessService.createAction(action).also { viewModel.writeMessage("action result: $it") }
                         }
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "PoiRequest.ActionVoid")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleTranId?.let {
                         val action = PoiRequest.ActionLinkedRefund(it)
                         lifecycleScope.launch {
-                            HeadlessService.createAction(action).also { viewModel.writeMessage("createAction: ${json.encodeToString(it)}") }
+                            HeadlessService.createAction(action).also { viewModel.writeMessage("action result: $it") }
                         }
                         launcher.launch(action)
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "PoiRequest.ActionLinkedRefund (full amt)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleTranId?.let {
                         val action = PoiRequest.ActionLinkedRefund(it, Amount(BigDecimal("0.5"), Currency.getInstance(viewModel.currency)))
                         lifecycleScope.launch {
-                            HeadlessService.createAction(action).also { viewModel.writeMessage("createAction: ${json.encodeToString(it)}") }
+                            HeadlessService.createAction(action).also { viewModel.writeMessage("action result: $it") }
                         }
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "PoiRequest.ActionLinkedRefund (partial amt)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleTranId?.let {
                         val query = Referencable.TranId(it)
                         lifecycleScope.launch {
-                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("queryTransaction: ${json.encodeToString(it)}") }
+                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("query result: $it") }
                         }
                     } ?: viewModel.writeMessage("No tran ID")
                 }) {
                     Text(text = "PoiRequest.Query (TranId)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSalePosReference?.let {
                         val query = Referencable.PosReference(it)
                         lifecycleScope.launch {
-                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("queryTransaction: ${json.encodeToString(it)}") }
+                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("query result: $it") }
                         }
                     } ?: viewModel.writeMessage("No pos ref")
                 }) {
                     Text(text = "PoiRequest.Query (PosReference)")
                 }
-                Button(onClick = {
+                ThemedButton(onClick = {
                     completedSaleRequestId?.let {
                         val query = Referencable.RequestId(it)
                         lifecycleScope.launch {
-                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("queryTransaction: ${json.encodeToString(it)}") }
+                            HeadlessService.getTransaction(query).also { viewModel.writeMessage("query result: $it") }
                         }
                     } ?: viewModel.writeMessage("No req id")
                 }) {

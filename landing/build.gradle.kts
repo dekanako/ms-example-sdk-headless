@@ -57,7 +57,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("com.aallam.ulid:ulid-kotlin:1.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    //implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     val versionHeadless: String by project
     implementation("com.theminesec.sdk:headless-stage:$versionHeadless")

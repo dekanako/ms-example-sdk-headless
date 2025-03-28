@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">HLEX XML Java</string>
+    <string name="app_name">HlExample XML Java</string>
     <string name="var_approval_code">App Code: %1$s</string>
 </resources>

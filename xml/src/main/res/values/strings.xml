@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">HLEX XML</string>
+    <string name="app_name">HlExample XML</string>
     <string name="var_approval_code">App Code: %1$s</string>
 </resources>
